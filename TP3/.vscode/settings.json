@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "jeu.h": "c",
+        "monde.h": "c",
+        "graphismes.h": "c",
+        "mlv_all.h": "c",
+        "graphique.h": "c",
+        "stdio.h": "c"
+    }
+}
