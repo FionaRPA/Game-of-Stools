@@ -2,6 +2,10 @@
 #define __MONDE__
 
 #include "quadrillage.h"
+#include <stdlib.h>
+#include <time.h>
+#include <assert.h>
+#include <MLV/MLV_all.h>
 
 
 typedef enum{
@@ -60,7 +64,6 @@ Serpent init_serpent(int taille, int nb_lignes, int nb_colonnes);
 void ajouter_pomme_empoisonnee(Monde *mon);
 
 
-
 /* Renvoie un monde avec `nb_pommes` pommes présentes, le serpent se trouve à sa
  * position initiale. */
 Monde init_monde(int nb_pommes, int taille_serpent, int nb_lignes, int nb_colonnes);
@@ -92,5 +95,12 @@ int manger_pomme_serpent(Monde *mon);
 
 /* Renvoie 1 si le serpent est mort et 0 si il est encore en vie */
 int mort_serpent(Monde *mon);
+
+
+/* Change la direction du serpent en fonction de la touche donnée en paramètre.
+ * Ne change rien si la touche n'est pas une flèche directionnelle, ou si le serpent fait demi-tours. */
+void changer_direction(Serpent *snake, MLV_Keyboard_button direction);
+
+
 
 #endif

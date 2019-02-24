@@ -1,9 +1,4 @@
-#include <stdlib.h>
-#include <time.h>
-#include <assert.h>
-#include <MLV/MLV_all.h>
-
-#include "includes/monde.h"
+#include "../includes/monde.h"
 
 
 Pomme pomme_gen_alea(int n, int m){
@@ -15,7 +10,7 @@ Pomme pomme_gen_alea(int n, int m){
 
 	ligne = rand() % n;
 	colonne = rand() % m;
-	
+
 	pomme.coordP.x = ligne;
 	pomme.coordP.y = colonne;
 
@@ -244,7 +239,7 @@ int manger_pomme_serpent(Monde *mon){
 	mon->snake.coordS[mon->snake.taille] = queue;
 
 	/* On joue le son. */
-	eat = MLV_load_sound("humm.wav");
+	eat = MLV_load_sound("../doc/humm.wav");
 	MLV_play_sound(eat, 1.0);
 	MLV_wait_milliseconds(800);
 	MLV_free_sound(eat);
@@ -281,20 +276,18 @@ int mort_serpent(Monde *mon){
 }
 
 
-/* Change la direction du serpent en fonction de la touche donnée en paramètre.
-Ne change rien si la touche n'est pas une flèche directionnelle, ou si le serpent fait demi-tours. */
 void changer_direction(Serpent *snake, MLV_Keyboard_button direction){
 	switch ( direction ){
 		case MLV_KEYBOARD_UP:
 			if (snake->dir != SUD) snake->dir = NORD;
 				break;
-		case MLV_KEYBOARD_RIGHT: 
+		case MLV_KEYBOARD_RIGHT:
 			if (snake->dir != OUEST) snake->dir = EST;
 				break;
-		case MLV_KEYBOARD_DOWN: 
+		case MLV_KEYBOARD_DOWN:
 			if (snake->dir != NORD) snake->dir = SUD;
 				break;
-		case MLV_KEYBOARD_LEFT: 
+		case MLV_KEYBOARD_LEFT:
 			if (snake->dir != EST) snake->dir = OUEST;
 				break;
 		default: break;

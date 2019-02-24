@@ -14,7 +14,14 @@ typedef struct {
 	int duree_tour;
 } Partie;
 
-/*void jouer();*/
+
+
+void jouer();
+
+
+/* Crée un fichier Serpent.ini dans lequel sont figurés les paramètre du jeu par défaut.
+ * Si le fichier existe déjà, la fonction vérifie les valeurs.
+ * Renvoie ensuite ces paramètres. */
 Partie init_parametres();
 
 

@@ -1,4 +1,4 @@
-#include "includes/quadrillage.h"
+#include "../includes/quadrillage.h"
 #include <stdio.h>
 
 void afficher_case(Case casee) {
