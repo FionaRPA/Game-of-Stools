@@ -32,7 +32,6 @@ typedef struct{
 typedef struct{
 	Serpent snake;
 	Pomme *pommes;
-	Pomme pomme_empoisonnee;
 	int pommes_presentes;
 	int pommes_mangees;
 	int lignes;
@@ -61,7 +60,7 @@ Serpent init_serpent(int taille, int nb_lignes, int nb_colonnes);
 
 
 /* De la même façon que ajouter_pomme_monde(), cette fonction ajoute une pomme empoisonnée. */
-void ajouter_pomme_empoisonnee(Monde *mon);
+void ajouter_pomme_empoisonnee(Monde *mon, int nb_empoisonnee);
 
 
 /* Renvoie un monde avec `nb_pommes` pommes présentes, le serpent se trouve à sa

@@ -11,12 +11,16 @@ typedef struct {
 	int largeur, hauteur;
 	int nb_pommes;
 	int taille_serpent;
+	int vitesse;
 	int duree_tour;
 } Partie;
 
 
 
 void jouer();
+
+
+void rejouer_ou_quitter();
 
 
 /* Crée un fichier Serpent.ini dans lequel sont figurés les paramètre du jeu par défaut.

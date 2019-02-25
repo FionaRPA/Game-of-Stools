@@ -14,7 +14,6 @@
 #define COULEUR_FOND MLV_COLOR_CORNFLOWER_BLUE
 #define COULEUR_CORPS MLV_COLOR_CHARTREUSE3
 #define COULEUR_CORPS_CONTOUR MLV_COLOR_CHARTREUSE4
-#define COULEUR_NOMBRE MLV_COLOR_GREEN4
 #define COULEUR_TEXTE MLV_COLOR_CHARTREUSE4
 
 #define COULEUR_POMME MLV_COLOR_FIREBRICK3
@@ -32,9 +31,9 @@ void afficher_pomme(Pomme *pom, int nb_lignes, int nb_colonnes, char* file);
 
 void afficher_serpent(Serpent *ser, int nb_lignes, int nb_colonnes);
 
-void afficher_monde(Monde *mon);
+void afficher_monde(Monde *mon, int temps);
 
-void affiche_fin(int score);
+void affiche_fin(int score, int bool);
 
 void afficher_pause();
 

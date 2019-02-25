@@ -3,7 +3,7 @@
 
 Pomme pomme_gen_alea(int n, int m){
 	Pomme pomme;
-	int ligne, colonne;
+	int ligne, colonne, random;
 
 	assert(n > 0);
 	assert(m > 0);
@@ -14,8 +14,12 @@ Pomme pomme_gen_alea(int n, int m){
 	pomme.coordP.x = ligne;
 	pomme.coordP.y = colonne;
 
-	if (rand()%100 < 20)
+	random = rand()%100;
+
+	if (random <= 20 && random > 6)
 		pomme.point = 2;
+	else if (random <= 6)
+		pomme.point = 0;
 	else
 		pomme.point = 1;
 
@@ -38,13 +42,9 @@ int est_vide(Monde *mon, Case cases){
 		if ((cases.x == mon->snake.coordS[i].x) && (cases.y == mon->snake.coordS[i].y))
 			return 0;
 	}
-	/* On vérifie s'il n'y a pas de pomme empoisonée. */
-	if (cases.x == mon->pomme_empoisonnee.coordP.x && cases.y == mon->pomme_empoisonnee.coordP.y)
-		return 0;
 
 	return 1;
 }
-
 
 void ajouter_pomme_monde(Monde *mon, int max_pommes){
 	Pomme pomme;
@@ -53,10 +53,8 @@ void ajouter_pomme_monde(Monde *mon, int max_pommes){
 
 	if (mon->pommes_presentes == max_pommes)
 		return;
-
 	/* Tant que la nouvelle pomme ne se situe pas sur une case vide. */
-	do{
-		/* On définis l'emplacement de la pomme à placer. */
+	do{ /* On définis l'emplacement de la pomme à placer. */
 		pomme = pomme_gen_alea(mon->lignes, mon->colonnes);
 
 	}while (!est_vide(mon, pomme.coordP));
@@ -84,7 +82,6 @@ Serpent init_serpent(int taille, int nb_lignes, int nb_colonnes){
 		snake.coordS[i].x = snake.coordS[i-1].x;
 		snake.coordS[i].y = snake.coordS[i-1].y - 1;
 	}
-
 	/* Le serpent à sa tête et une partie de son corps, sa taille est donc de 2. */
 	snake.taille = taille;
 	snake.dir = EST;
@@ -92,22 +89,20 @@ Serpent init_serpent(int taille, int nb_lignes, int nb_colonnes){
 	return snake;
 }
 
-/* De la même façon que ajouter_pomme_monde(), cette fonction ajoute une pomme empoisonnée. */
-void ajouter_pomme_empoisonnee(Monde *mon){
+/* De la même façon que ajouter_pomme_monde(), cette fonction ajoute une pomme empoisonnée.
+void ajouter_pomme_empoisonnee(Monde *mon, int nb_empoisonnee){
 	Pomme pomme;
 
 	assert(mon != NULL);
 
-	do{
-		/* On définis l'emplacement de la pomme empoisonnée à placer. */
+	do{ *//* On définis l'emplacement de la pomme empoisonnée à placer. */
+	/*
 		pomme = pomme_gen_alea(mon->lignes, mon->colonnes);
-
 	} while (!est_vide(mon, pomme.coordP));
 
-	mon->pomme_empoisonnee = pomme;
-
+	mon->pomme_empoisonnee[nb_empoisonnee] = pomme;
 }
-
+*/
 Monde init_monde(int nb_pommes, int taille_serpent, int nb_lignes, int nb_colonnes){
 	Monde mon;
 	int i;
@@ -130,12 +125,10 @@ Monde init_monde(int nb_pommes, int taille_serpent, int nb_lignes, int nb_colonn
 		ajouter_pomme_monde(&mon, nb_pommes);
 
 	mon.pommes_presentes = nb_pommes;
-	ajouter_pomme_empoisonnee(&mon);
 	mon.pommes_mangees = 0;
 
 	return mon;
 }
-
 
 
 Case case_suivante(Monde mon) {
@@ -157,7 +150,6 @@ Case case_suivante(Monde mon) {
 	}
 	return suivante;
 }
-
 
 
 void ajout(Case lst[], int taille, Case nouv){
@@ -193,7 +185,6 @@ int deplacer_serpent(Monde *mon){
 	return 1;
 }
 
-
 void supprime_pomme(Monde *mon, int indice){
 	Pomme tmp;
 
@@ -209,7 +200,6 @@ void supprime_pomme(Monde *mon, int indice){
 	}
 	mon->pommes_presentes -= 1;
 }
-
 
 int manger_pomme_serpent(Monde *mon){
 	Case suivante;
@@ -239,7 +229,7 @@ int manger_pomme_serpent(Monde *mon){
 	mon->snake.coordS[mon->snake.taille] = queue;
 
 	/* On joue le son. */
-	eat = MLV_load_sound("../doc/humm.wav");
+	eat = MLV_load_sound("../doc/audio/humm.wav");
 	MLV_play_sound(eat, 1.0);
 	MLV_wait_milliseconds(800);
 	MLV_free_sound(eat);
@@ -250,7 +240,6 @@ int manger_pomme_serpent(Monde *mon){
 	return 1;
 }
 
-
 int mort_serpent(Monde *mon){
 	Case suivante;
 	int i;
@@ -260,11 +249,12 @@ int mort_serpent(Monde *mon){
 	suivante = case_suivante(*mon);
 
 	/* On vérifie si la case suivante n'est pas une pomme empoisonnée. */
-	if ( suivante.x == mon->pomme_empoisonnee.coordP.x && suivante.y == mon->pomme_empoisonnee.coordP.y)
-		return 1;
+	for (i = 0; i < mon->pommes_presentes; i++)
+		if (suivante.x == mon->pommes[i].coordP.x && suivante.y == mon->pommes[i].coordP.y && mon->pommes[i].point == 0)
+			return 1;
 
     /* On vérifie si la case suivante ne se situe pas sur les bords. */
-    if ( suivante.x == mon->lignes || suivante.y == mon->colonnes || suivante.x == -1 || suivante.y == -1)
+    if (suivante.x == mon->lignes || suivante.y == mon->colonnes || suivante.x == -1 || suivante.y == -1)
         return 1;
 
     /* On vérifie si un morceau du serpent se situe sur la case suivante. */
@@ -274,7 +264,6 @@ int mort_serpent(Monde *mon){
     }
     return 0;
 }
-
 
 void changer_direction(Serpent *snake, MLV_Keyboard_button direction){
 	switch ( direction ){
