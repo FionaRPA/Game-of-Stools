@@ -1,14 +1,20 @@
 #ifndef __MONDE__
 #define __MONDE__
 
-#include "quadrillage.h"
+
 #include <stdlib.h>
 #include <time.h>
 #include <assert.h>
 #include <MLV/MLV_all.h>
 
 
-typedef enum{
+typedef struct {
+	int x;
+	int y;
+} Case;
+
+
+typedef enum {
 	NORD,
 	SUD,
 	EST,
@@ -16,20 +22,20 @@ typedef enum{
 }Direction;
 
 
-typedef struct{
+typedef struct {
 	Case *coordS;
 	int taille;
 	Direction dir;
 }Serpent;
 
 
-typedef struct{
+typedef struct {
 	Case coordP;
 	int point;
 }Pomme;
 
 
-typedef struct{
+typedef struct {
 	Serpent snake;
 	Pomme *pommes;
 	int pommes_presentes;
@@ -39,6 +45,8 @@ typedef struct{
 }Monde;
 
 
+
+void afficher_case(Case casee);
 
 /* Renvoie une pomme générée aléatoirement de sorte qu'elle tienne
  * dans un quadrillage n*m. */

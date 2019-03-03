@@ -3,7 +3,9 @@
 
 
 #include "monde.h"
+#include "score.h"
 #include "graphique.h"
+#include "menu.h"
 #include <MLV/MLV_all.h>
 
 
@@ -16,11 +18,13 @@ typedef struct {
 } Partie;
 
 
+void creer_fenetre();
 
-void jouer();
+
+void jouer(Monde *monde);
 
 
-void rejouer_ou_quitter();
+void rejouer_ou_quitter(Monde *monde);
 
 
 /* Crée un fichier Serpent.ini dans lequel sont figurés les paramètre du jeu par défaut.

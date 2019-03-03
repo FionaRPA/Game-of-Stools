@@ -1,23 +1,27 @@
+CC = gcc
+ICLD = ../includes/
+LDFLAGS = -lm -lMLV
 CFLAGS = -ansi -pedantic -Wall -Wfatal-errors
+OBJ = menu.o score.o jeu.o monde.o graphique.o main.o
 
-snake: jeu.o monde.o graphique.o quadrillage.o main.o
-	gcc -o snake jeu.o monde.o graphique.o quadrillage.o main.o -lMLV $(CFLAGS)
-	rm ../includes/graphique.h.gch graphique.o ../includes/jeu.h.gch jeu.o main.o ../includes/monde.h.gch monde.o ../includes/quadrillage.h.gch quadrillage.o
+snake: $(OBJ)
+	$(CC) -o $@ $^ $(LDFLAGS) $(CFLAGS)
 
-jeu.o: ../includes/jeu.h jeu.c ../includes/graphique.h ../includes/monde.h
-	gcc -c ../includes/jeu.h jeu.c ../includes/graphique.h ../includes/monde.h $(CFLAGS)
+menu.o: $(ICLD)menu.h menu.c $(ICLD)graphique.h
 
-monde.o: ../includes/monde.h monde.c ../includes/quadrillage.h 
-	gcc -c ../includes/monde.h monde.c ../includes/quadrillage.h quadrillage.c $(CFLAGS)
+jeu.o: $(ICLD)jeu.h jeu.c $(ICLD)graphique.h $(ICLD)monde.h $(ICLD)menu.h
 
-graphique.o: ../includes/graphique.h graphique.c
-	gcc -c ../includes/graphique.h graphique.c $(CFLAGS)
+monde.o: $(ICLD)monde.h monde.c
 
-quadrillage.o: ../includes/quadrillage.h quadrillage.c
-	gcc -c ../includes/quadrillage.h quadrillage.c $(CFLAGS)
+graphique.o: $(ICLD)graphique.h graphique.c
 
-main.o: main.c ../includes/jeu.h ../includes/graphique.h
-	gcc -c main.c ../includes/jeu.h ../includes/graphique.h $(CFLAGS)
+score.o: $(ICLD)score.h score.c
+
+main.o: main.c $(ICLD)jeu.h $(ICLD)graphique.h
+
+%.o: %.c
+		$(CC) -c $< $(CFLAGS)
 
 clear:
+	rm $(OBJ)
 	rm snake

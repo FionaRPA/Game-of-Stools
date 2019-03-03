@@ -7,12 +7,13 @@ void afficher_quadrillage(Monde *mon){
     assert(mon != NULL);
 
     larg = ((FENETRE_X - 10) / mon->colonnes);
-    haut = ((FENETRE_Y - 80) / mon->lignes);
+    haut = ((FENETRE_Y - 60) / mon->lignes);
 
     y = 5;
     x = 5;
     /* Affichage du fond. */
     MLV_clear_window(COULEUR_FOND);
+
     /* Affichage des cases. */
     for (i = 0; i < mon->lignes; i++){
         for (j = 0; j < mon->colonnes; j++){
@@ -22,11 +23,15 @@ void afficher_quadrillage(Monde *mon){
         x = 5;
         y += haut;
     }
+    MLV_draw_rectangle(5, 5, (FENETRE_X - 5) - larg, (FENETRE_Y - 55) - haut, MLV_COLOR_BLACK);
 }
 
 
 void load_image(char* file, int larg, int haut, int pos_x, int pos_y){
     MLV_Image *image;
+
+    assert(file != NULL);
+
     image = MLV_load_image(file);
     MLV_resize_image_with_proportions(image, larg + 5, haut + 5);
     MLV_draw_image(MLV_copy_image(image), pos_x, pos_y);
@@ -38,9 +43,10 @@ void afficher_pomme(Pomme *pom, int nb_lignes, int nb_colonnes, char* file){
 		int pos_x, pos_y/*, rayon*/;
 		int larg, haut;
 
-		assert(NULL != pom);
+		assert(pom != NULL);
+    assert(file != NULL);
 
-		larg = ((FENETRE_Y - 80) / nb_lignes);
+		larg = ((FENETRE_Y - 60) / nb_lignes);
 		haut = ((FENETRE_X - 10) / nb_colonnes);
 		pos_x = pom->coordP.y * haut + 5;
 		pos_y = pom->coordP.x * larg;
@@ -61,7 +67,7 @@ void afficher_serpent(Serpent *ser, int nb_lignes, int nb_colonnes){
     assert(NULL != ser);
 
     /* On affiche la tête du serpent. */
-    larg = ((FENETRE_Y - 80) / nb_lignes);
+    larg = ((FENETRE_Y - 60) / nb_lignes);
     haut = ((FENETRE_X - 10) / nb_colonnes);
 
     pos_x = ser->coordS[0].y * haut + 5;
@@ -86,7 +92,7 @@ void afficher_serpent(Serpent *ser, int nb_lignes, int nb_colonnes){
 
 void afficher_monde(Monde *mon, int temps){
     int i;
-    MLV_Font *police;
+    MLV_Font *font;
 
     assert(mon != NULL);
 
@@ -103,42 +109,41 @@ void afficher_monde(Monde *mon, int temps){
     afficher_serpent(&(mon->snake), mon->lignes, mon->colonnes);
 
     /* On affiche le nombre de pommes mangées sur la tête du serpent. */
-    police = MLV_load_font("../doc/font/coolvetica_rg.ttf", 50);
-    MLV_draw_text_with_font(10, FENETRE_Y - 60, "Score: %d", police, COULEUR_TEXTE, mon->pommes_mangees);
-		MLV_draw_text_with_font(FENETRE_X - 250, FENETRE_Y - 60, "Chrono: %d", police,  COULEUR_TEXTE, temps);
+    font = MLV_load_font("../doc/font/coolvetica_rg.ttf", 50);
+    MLV_draw_text_with_font(10, FENETRE_Y - 60, "Score: %d", font, COULEUR_TEXTE, mon->pommes_mangees);
+		MLV_draw_text_with_font(FENETRE_X - 250, FENETRE_Y - 60, "Chrono: %d", font,  COULEUR_TEXTE, temps);
 
-    MLV_free_font(police);
-
+    MLV_free_font(font);
     MLV_actualise_window();
 }
 
 
 void affiche_fin(int score, int bool){
     int largeur_texte, hauteur_texte;
-    MLV_Font *police;
+    MLV_Font *font;
 
     assert(score >= 0);
 
     MLV_clear_window(COULEUR_FOND);
 
-    police = MLV_load_font("../doc/font/coolvetica_rg.ttf", FENETRE_X * 0.1 );
+    font = MLV_load_font("../doc/font/coolvetica_rg.ttf", FENETRE_X * 0.1 );
 		if (bool){
-			MLV_get_size_of_text_with_font( "Fin du temps imparti", &largeur_texte, &hauteur_texte, police);
-			MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, (FENETRE_Y - hauteur_texte) / 2, "Fin du temps imparti", police, COULEUR_TEXTE);
+			MLV_get_size_of_text_with_font( "Fin du temps imparti", &largeur_texte, &hauteur_texte, font);
+			MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, (FENETRE_Y - hauteur_texte) / 2, "Fin du temps imparti", font, COULEUR_TEXTE);
 			MLV_actualise_window();
 			MLV_wait_mouse(NULL, NULL);
 			MLV_clear_window(COULEUR_FOND);
 		}
 
-    MLV_get_size_of_text_with_font("GAME OVER", &largeur_texte, &hauteur_texte, police);
-    MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, FENETRE_Y * 0.1, "GAME OVER", police, COULEUR_TEXTE);
+    MLV_get_size_of_text_with_font("GAME OVER", &largeur_texte, &hauteur_texte, font);
+    MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, FENETRE_Y * 0.1, "GAME OVER", font, COULEUR_TEXTE);
 
     MLV_draw_line(FENETRE_X * 0.2, FENETRE_Y * 0.1 + hauteur_texte, FENETRE_X * 0.8, FENETRE_Y * 0.1 + hauteur_texte, COULEUR_TEXTE);
 
-    MLV_get_size_of_text_with_font( "Score : %d", &largeur_texte, &hauteur_texte, police, score );
-    MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, (FENETRE_Y - hauteur_texte) / 2, "Score : %d", police, COULEUR_TEXTE, score);
+    MLV_get_size_of_text_with_font( "Score : %d", &largeur_texte, &hauteur_texte, font, score );
+    MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, (FENETRE_Y - hauteur_texte) / 2, "Score : %d", font, COULEUR_TEXTE, score);
 
-		MLV_free_font(police);
+		MLV_free_font(font);
     MLV_actualise_window();
 
     MLV_wait_mouse(NULL, NULL);
@@ -148,21 +153,21 @@ void affiche_fin(int score, int bool){
 void afficher_pause(){
     int largeur_texte, hauteur_texte;
     MLV_Keyboard_button touche;
-    MLV_Font *police;
+    MLV_Font *font;
 
     MLV_save_screen();
     /* On assombris l'écran. */
     MLV_clear_window(MLV_rgba(0, 0, 0, 120));
 
     /* On affiche le cadre. */
-    MLV_draw_filled_rectangle(FENETRE_X*0.3, FENETRE_Y*0.3, FENETRE_X*0.4, FENETRE_Y*0.4, MLV_COLOR_BLACK);
-    MLV_draw_filled_rectangle(FENETRE_X*0.3 + 2, FENETRE_Y*0.3 + 2, FENETRE_X*0.4 - 4, FENETRE_Y*0.4 - 4, COULEUR_FOND);
+    MLV_draw_filled_rectangle(FENETRE_X * 0.3, FENETRE_Y * 0.3, FENETRE_X * 0.4, FENETRE_Y * 0.4, MLV_COLOR_BLACK);
+    MLV_draw_filled_rectangle(FENETRE_X * 0.3 + 2, FENETRE_Y * 0.3 + 2, FENETRE_X * 0.4 - 4, FENETRE_Y * 0.4 - 4, COULEUR_FOND);
 
     /* Affichage du mot "PAUSE". */
-    police = MLV_load_font("../doc/font/coolvetica_rg.ttf", FENETRE_X * 0.043 );
-    MLV_get_size_of_text_with_font("PAUSE", &largeur_texte, &hauteur_texte, police);
-    MLV_draw_text_with_font((FENETRE_X - largeur_texte)/2, FENETRE_Y*0.35, "PAUSE", police, COULEUR_TEXTE);
-    MLV_free_font(police);
+    font = MLV_load_font("../doc/font/coolvetica_rg.ttf", FENETRE_X * 0.05 );
+    MLV_get_size_of_text_with_font("PAUSE", &largeur_texte, &hauteur_texte, font);
+    MLV_draw_text_with_font((FENETRE_X - largeur_texte)/2, FENETRE_Y*0.4, "PAUSE", font, COULEUR_TEXTE);
+    MLV_free_font(font);
 
     MLV_actualise_window();
 

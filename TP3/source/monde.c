@@ -1,5 +1,8 @@
 #include "../includes/monde.h"
 
+void afficher_case(Case casee) {
+	printf("(%d, %d)\n", casee.x, casee.y);
+}
 
 Pomme pomme_gen_alea(int n, int m){
 	Pomme pomme;
@@ -89,20 +92,7 @@ Serpent init_serpent(int taille, int nb_lignes, int nb_colonnes){
 	return snake;
 }
 
-/* De la même façon que ajouter_pomme_monde(), cette fonction ajoute une pomme empoisonnée.
-void ajouter_pomme_empoisonnee(Monde *mon, int nb_empoisonnee){
-	Pomme pomme;
 
-	assert(mon != NULL);
-
-	do{ *//* On définis l'emplacement de la pomme empoisonnée à placer. */
-	/*
-		pomme = pomme_gen_alea(mon->lignes, mon->colonnes);
-	} while (!est_vide(mon, pomme.coordP));
-
-	mon->pomme_empoisonnee[nb_empoisonnee] = pomme;
-}
-*/
 Monde init_monde(int nb_pommes, int taille_serpent, int nb_lignes, int nb_colonnes){
 	Monde mon;
 	int i;
@@ -216,15 +206,16 @@ int manger_pomme_serpent(Monde *mon){
 		if (suivante.x == mon->pommes[i].coordP.x && suivante.y == mon->pommes[i].coordP.y)
 			indice_pomme = i;
 	}
-
 	/* Si indice_pomme n'est pas modifiée c'est qu'on a pas trouvé de pomme. */
 	if (indice_pomme == -1)
 		return 0;
 
+	mon->snake.taille += mon->pommes[indice_pomme].point;
+	mon->pommes_mangees += mon->pommes[indice_pomme].point;
 	/* Sinon on la supprime et on agrandis le serpent. */
 	supprime_pomme(mon, indice_pomme);
 	/* On retient la position de la queue du serpent (sa dernière partie), on déplace le serpent puis on lui rajoute sa queue. */
-	queue = mon->snake.coordS[ mon->snake.taille - 1 ];
+	queue = mon->snake.coordS[mon->snake.taille - 1];
 	ajout( mon->snake.coordS, mon->snake.taille, suivante);
 	mon->snake.coordS[mon->snake.taille] = queue;
 
@@ -233,9 +224,6 @@ int manger_pomme_serpent(Monde *mon){
 	MLV_play_sound(eat, 1.0);
 	MLV_wait_milliseconds(800);
 	MLV_free_sound(eat);
-
-	mon->snake.taille += 1;
-	mon->pommes_mangees += 1;
 
 	return 1;
 }
@@ -266,7 +254,7 @@ int mort_serpent(Monde *mon){
 }
 
 void changer_direction(Serpent *snake, MLV_Keyboard_button direction){
-	switch ( direction ){
+	switch (direction){
 		case MLV_KEYBOARD_UP:
 			if (snake->dir != SUD) snake->dir = NORD;
 				break;

@@ -1,9 +1,32 @@
 #include "../includes/jeu.h"
 
 
-void jouer(){
-	Partie parametres;
+void creer_fenetre(){
 	Monde monde;
+  int res, largeur, hauteur;
+	char *nom;
+	MLV_Font *font;
+
+	MLV_create_window("Snake", "Snake", FENETRE_X, FENETRE_Y);
+	res = menu();
+	if (res == 2)
+		return;
+	else if (res == 1){
+		afficheScore(0, NULL);
+	}
+	MLV_clear_window(COULEUR_FOND);
+	font = MLV_load_font("../doc/font/coolvetica_rg.ttf", FENETRE_X * 0.05 );
+	MLV_get_size_of_adapted_text_box_with_font(" Votre Nom: ", font, 1, &largeur, &hauteur);
+	MLV_wait_input_box_with_font(50, FENETRE_Y/2 - 100, FENETRE_X - 50, 100, MLV_COLOR_BLACK, COULEUR_TEXTE, MLV_COLOR_BLACK, " Votre Nom: ", &nom, font);
+	MLV_free_font(font);
+	jouer(&monde);
+
+	afficheScore(monde.pommes_mangees, nom);
+	free(nom);
+}
+
+void jouer(Monde *monde){
+	Partie parametres;
 	MLV_Keyboard_button touche;
 	MLV_Button_state mode;
 	MLV_Music* music;
@@ -14,8 +37,8 @@ void jouer(){
 	/* Initialisation */
 	time(&depart);
 	parametres = init_parametres();
-	monde = init_monde(parametres.nb_pommes, parametres.taille_serpent, parametres.hauteur, parametres.largeur);
-	afficher_monde(&monde, temps);
+	(*monde) = init_monde(parametres.nb_pommes, parametres.taille_serpent, parametres.hauteur, parametres.largeur);
+	afficher_monde(monde, temps);
 	MLV_init_audio();
 	music = MLV_load_music("../doc/audio/mario.mp3");
 	end = MLV_load_sound("../doc/audio/smb_mariodie.wav");
@@ -23,7 +46,7 @@ void jouer(){
 	times_up = MLV_load_sound("../doc/audio/times-up.wav");
 
 	MLV_wait_keyboard(&touche, NULL, NULL);
-	changer_direction( &(monde.snake), touche);
+	changer_direction( &(monde->snake), touche);
 	MLV_play_music(music, 1.0, -1);
 
 	/* Boucle de jeu.*/
@@ -34,7 +57,7 @@ void jouer(){
 		if(temps >= parametres.duree_tour){
 			MLV_stop_music();
 			MLV_play_sound(times_up, 1);
-			affiche_fin(monde.pommes_mangees, 1);
+			affiche_fin(monde->pommes_mangees, 1);
 			break;
 		}
 		if (MLV_get_event(&touche, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &mode) == MLV_KEY){
@@ -42,19 +65,19 @@ void jouer(){
 				MLV_play_sound(pause, 1);
 				afficher_pause();
 			}
-			changer_direction(&(monde.snake), touche);
+			changer_direction(&(monde->snake), touche);
 		}
 
-		if (mort_serpent(&monde)){
+		if (mort_serpent(monde)){
 			MLV_play_sound(end, 2);
 			MLV_wait_seconds(2);
 			break;
 		}
-		else if (!deplacer_serpent(&monde)){
-			manger_pomme_serpent(&monde);
-			ajouter_pomme_monde(&monde, parametres.nb_pommes);
+		else if (!deplacer_serpent(monde)){
+			manger_pomme_serpent(monde);
+			ajouter_pomme_monde(monde, parametres.nb_pommes);
 		}
-		afficher_monde(&monde, temps);
+		afficher_monde(monde, temps);
 
 		MLV_wait_milliseconds(parametres.vitesse);
 	}
@@ -67,18 +90,17 @@ void jouer(){
 	MLV_free_sound(times_up);
 	MLV_free_audio();
 
-	affiche_fin(monde.pommes_mangees, 0);
-	rejouer_ou_quitter();
+	affiche_fin(monde->pommes_mangees, 0);
+	rejouer_ou_quitter(monde);
 }
 
-void rejouer_ou_quitter(){
+void rejouer_ou_quitter(Monde *mon){
     int x, y;
 
 		MLV_clear_window(COULEUR_FOND);
 
     MLV_draw_text_box(FENETRE_X / 2 - 150, FENETRE_Y / 2 + 120, 300, 50, "Rejouer", 9,  COULEUR_TEXTE, COULEUR_TEXTE,  MLV_COLOR_BLACK, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
     MLV_draw_text_box(FENETRE_X / 2 - 150, FENETRE_Y / 2 - 220, 300, 50, "Quitter", 9,  COULEUR_TEXTE, COULEUR_TEXTE,  MLV_COLOR_BLACK, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
-
 
     MLV_actualise_window();
 
@@ -89,11 +111,11 @@ void rejouer_ou_quitter(){
           && !(x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 - 220 && y <= (FENETRE_Y / 2 - 220) + 50));
 
     if (x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 - 120 && y <= (FENETRE_Y / 2 + 120) + 50) {
-        jouer();
+        jouer(mon);
     }
 
     if (x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 - 120 && y <= (FENETRE_Y / 2 - 220) + 50)
-        exit(EXIT_FAILURE);
+        return;
 
     MLV_actualise_window();
 }
@@ -103,9 +125,9 @@ Partie init_parametres(){
 	FILE* fichier;
 	Partie parametres;
 
-	fichier = fopen("Serpent.ini", "r+");
+	fichier = fopen("../doc/fichier/Serpent.ini", "r+");
 	if (NULL == fichier)
-		fichier = fopen("Serpent.ini", "w");
+		fichier = fopen("../doc/fichier/Serpent.ini", "w");
 
 	if (fscanf(fichier, "largeur = %d\n", &(parametres.largeur)) != 1){
 		parametres.largeur = 20;
