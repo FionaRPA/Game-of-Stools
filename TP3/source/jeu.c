@@ -3,7 +3,8 @@
 
 void creer_fenetre(){
 	Monde monde;
-  int res, largeur, hauteur;
+	int res, largeur, hauteur;
+	int temps;
 	char *nom;
 	MLV_Font *font;
 
@@ -12,33 +13,33 @@ void creer_fenetre(){
 	if (res == 2)
 		return;
 	else if (res == 1){
-		afficheScore(0, NULL);
+		afficheScore(0, NULL, 0);
 	}
 	MLV_clear_window(COULEUR_FOND);
 	font = MLV_load_font("../doc/font/coolvetica_rg.ttf", FENETRE_X * 0.05 );
 	MLV_get_size_of_adapted_text_box_with_font(" Votre Nom: ", font, 1, &largeur, &hauteur);
 	MLV_wait_input_box_with_font(50, FENETRE_Y/2 - 100, FENETRE_X - 50, 100, MLV_COLOR_BLACK, COULEUR_TEXTE, MLV_COLOR_BLACK, " Votre Nom: ", &nom, font);
 	MLV_free_font(font);
-	jouer(&monde);
+	jouer(&monde, &temps);
 
-	afficheScore(monde.pommes_mangees, nom);
+	afficheScore(monde.pommes_mangees, nom, temps);
 	free(nom);
 }
 
-void jouer(Monde *monde){
+void jouer(Monde *monde, int *temps){
 	Partie parametres;
 	MLV_Keyboard_button touche;
 	MLV_Button_state mode;
 	MLV_Music* music;
 	MLV_Sound* end, *pause, *times_up;
 	time_t depart, fin;
-	int temps = 0;
 
 	/* Initialisation */
 	time(&depart);
+	(*temps) = 0;
 	parametres = init_parametres();
 	(*monde) = init_monde(parametres.nb_pommes, parametres.taille_serpent, parametres.hauteur, parametres.largeur);
-	afficher_monde(monde, temps);
+	afficher_monde(monde, *temps);
 	MLV_init_audio();
 	music = MLV_load_music("../doc/audio/mario.mp3");
 	end = MLV_load_sound("../doc/audio/smb_mariodie.wav");
@@ -49,16 +50,16 @@ void jouer(Monde *monde){
 	changer_direction( &(monde->snake), touche);
 	MLV_play_music(music, 1.0, -1);
 
-	/* Boucle de jeu.*/
+	/* Boucle principale du jeu.*/
 	while (1){
 		time(&fin);
-		temps = difftime(fin, depart);
+		(*temps) = difftime(fin, depart);
 
-		if(temps >= parametres.duree_tour){
+		if((*temps) >= parametres.duree_tour){
 			MLV_stop_music();
 			MLV_play_sound(times_up, 1);
 			affiche_fin(monde->pommes_mangees, 1);
-			break;
+			return;
 		}
 		if (MLV_get_event(&touche, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &mode) == MLV_KEY){
 			if (touche == MLV_KEYBOARD_SPACE && mode == MLV_PRESSED){
@@ -77,7 +78,7 @@ void jouer(Monde *monde){
 			manger_pomme_serpent(monde);
 			ajouter_pomme_monde(monde, parametres.nb_pommes);
 		}
-		afficher_monde(monde, temps);
+		afficher_monde(monde, *temps);
 
 		MLV_wait_milliseconds(parametres.vitesse);
 	}
@@ -91,13 +92,13 @@ void jouer(Monde *monde){
 	MLV_free_audio();
 
 	affiche_fin(monde->pommes_mangees, 0);
-	rejouer_ou_quitter(monde);
+	rejouer_ou_quitter(monde, temps);
 }
 
-void rejouer_ou_quitter(Monde *mon){
+void rejouer_ou_quitter(Monde *mon, int *temps){
     int x, y;
 
-		MLV_clear_window(COULEUR_FOND);
+	MLV_clear_window(COULEUR_FOND);
 
     MLV_draw_text_box(FENETRE_X / 2 - 150, FENETRE_Y / 2 + 120, 300, 50, "Rejouer", 9,  COULEUR_TEXTE, COULEUR_TEXTE,  MLV_COLOR_BLACK, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
     MLV_draw_text_box(FENETRE_X / 2 - 150, FENETRE_Y / 2 - 220, 300, 50, "Quitter", 9,  COULEUR_TEXTE, COULEUR_TEXTE,  MLV_COLOR_BLACK, MLV_TEXT_CENTER, MLV_HORIZONTAL_CENTER, MLV_VERTICAL_CENTER);
@@ -105,13 +106,13 @@ void rejouer_ou_quitter(Monde *mon){
     MLV_actualise_window();
 
     /*Pour commencer une nouvelle partie. */
-    do{
-			MLV_wait_mouse(&x, &y);
-    }while(!(x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 + 120 && y <= (FENETRE_Y / 2 + 120) + 50)
+    do {
+		MLV_wait_mouse(&x, &y);
+    } while(!(x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 + 120 && y <= (FENETRE_Y / 2 + 120) + 50)
           && !(x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 - 220 && y <= (FENETRE_Y / 2 - 220) + 50));
 
-    if (x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 - 120 && y <= (FENETRE_Y / 2 + 120) + 50) {
-        jouer(mon);
+    if (x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 - 120 && y <= (FENETRE_Y / 2 + 120) + 50){
+        jouer(mon, temps);
     }
 
     if (x >= FENETRE_X / 2 - 150 && x <= ((FENETRE_X / 2 - 150) + 300) && y >= FENETRE_Y / 2 - 120 && y <= (FENETRE_Y / 2 - 220) + 50)

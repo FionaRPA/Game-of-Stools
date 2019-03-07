@@ -23,7 +23,6 @@ void afficher_quadrillage(Monde *mon){
         x = 5;
         y += haut;
     }
-    MLV_draw_rectangle(5, 5, (FENETRE_X - 5) - larg, (FENETRE_Y - 55) - haut, MLV_COLOR_BLACK);
 }
 
 
@@ -40,28 +39,22 @@ void load_image(char* file, int larg, int haut, int pos_x, int pos_y){
 
 
 void afficher_pomme(Pomme *pom, int nb_lignes, int nb_colonnes, char* file){
-		int pos_x, pos_y/*, rayon*/;
-		int larg, haut;
+    int pos_x, pos_y;
+    int larg, haut;
 
-		assert(pom != NULL);
+    assert(pom != NULL);
     assert(file != NULL);
 
-		larg = ((FENETRE_Y - 60) / nb_lignes);
-		haut = ((FENETRE_X - 10) / nb_colonnes);
-		pos_x = pom->coordP.y * haut + 5;
-		pos_y = pom->coordP.x * larg;
-
-		/*rayon = ((FENETRE_X / nb_colonnes) / 2) * 0.8;
-
-		MLV_draw_filled_circle(pos_x + rayon, pos_y + rayon, rayon, COULEUR_POMME_CONTOUR);
-		MLV_draw_filled_circle(pos_x + rayon, pos_y + rayon, rayon - 2, MLV_COLOR_GOLD);
-
-    */load_image(file, larg, haut, pos_x, pos_y);
+    larg = ((FENETRE_Y - 60) / nb_lignes);
+    haut = ((FENETRE_X - 10) / nb_colonnes);
+    pos_x = pom->coordP.y * haut + 5;
+    pos_y = pom->coordP.x * larg;
+    load_image(file, larg, haut, pos_x, pos_y);
 }
 
 
 void afficher_serpent(Serpent *ser, int nb_lignes, int nb_colonnes){
-    int pos_x, pos_y/*, rayon*/;
+    int pos_x, pos_y;
     int i, larg, haut;
 
     assert(NULL != ser);
@@ -72,12 +65,7 @@ void afficher_serpent(Serpent *ser, int nb_lignes, int nb_colonnes){
 
     pos_x = ser->coordS[0].y * haut + 5;
     pos_y = ser->coordS[0].x * larg + 5;
-
-/*    rayon = ((FENETRE_X / nb_colonnes) / 2) * 0.8;
-    MLV_draw_filled_circle(pos_x + rayon, pos_y + rayon, rayon, COULEUR_TETE_CONTOUR);
-    MLV_draw_filled_circle(pos_x + rayon, pos_y + rayon, rayon - 2, COULEUR_TETE);
-
-*/	load_image("../doc/image/serpent.png", larg, haut, pos_x, pos_y);
+    load_image("../doc/image/serpent.png", larg, haut, pos_x, pos_y);
 
     /* On affiche le corps. */
     for (i = 1; i < ser->taille; i++){
@@ -111,7 +99,7 @@ void afficher_monde(Monde *mon, int temps){
     /* On affiche le nombre de pommes mangées sur la tête du serpent. */
     font = MLV_load_font("../doc/font/coolvetica_rg.ttf", 50);
     MLV_draw_text_with_font(10, FENETRE_Y - 60, "Score: %d", font, COULEUR_TEXTE, mon->pommes_mangees);
-		MLV_draw_text_with_font(FENETRE_X - 250, FENETRE_Y - 60, "Chrono: %d", font,  COULEUR_TEXTE, temps);
+	MLV_draw_text_with_font(FENETRE_X - 250, FENETRE_Y - 60, "Chrono: %d", font,  COULEUR_TEXTE, temps);
 
     MLV_free_font(font);
     MLV_actualise_window();
@@ -127,23 +115,19 @@ void affiche_fin(int score, int bool){
     MLV_clear_window(COULEUR_FOND);
 
     font = MLV_load_font("../doc/font/coolvetica_rg.ttf", FENETRE_X * 0.1 );
-		if (bool){
-			MLV_get_size_of_text_with_font( "Fin du temps imparti", &largeur_texte, &hauteur_texte, font);
-			MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, (FENETRE_Y - hauteur_texte) / 2, "Fin du temps imparti", font, COULEUR_TEXTE);
-			MLV_actualise_window();
-			MLV_wait_mouse(NULL, NULL);
-			MLV_clear_window(COULEUR_FOND);
-		}
-
-    MLV_get_size_of_text_with_font("GAME OVER", &largeur_texte, &hauteur_texte, font);
-    MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, FENETRE_Y * 0.1, "GAME OVER", font, COULEUR_TEXTE);
-
-    MLV_draw_line(FENETRE_X * 0.2, FENETRE_Y * 0.1 + hauteur_texte, FENETRE_X * 0.8, FENETRE_Y * 0.1 + hauteur_texte, COULEUR_TEXTE);
-
+    if (bool){
+        MLV_get_size_of_text_with_font( "Fin du temps imparti", &largeur_texte, &hauteur_texte, font);
+        MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, FENETRE_Y * 0.1, "Fin du temps imparti", font, COULEUR_TEXTE);
+    }
+    else if (!(bool)){
+        MLV_get_size_of_text_with_font("GAME OVER", &largeur_texte, &hauteur_texte, font);
+        MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, FENETRE_Y * 0.1, "GAME OVER", font, COULEUR_TEXTE);
+        MLV_draw_line(FENETRE_X * 0.2, FENETRE_Y * 0.1 + hauteur_texte, FENETRE_X * 0.8, FENETRE_Y * 0.1 + hauteur_texte, COULEUR_TEXTE);
+    }
     MLV_get_size_of_text_with_font( "Score : %d", &largeur_texte, &hauteur_texte, font, score );
     MLV_draw_text_with_font((FENETRE_X - largeur_texte) / 2, (FENETRE_Y - hauteur_texte) / 2, "Score : %d", font, COULEUR_TEXTE, score);
 
-		MLV_free_font(font);
+	MLV_free_font(font);
     MLV_actualise_window();
 
     MLV_wait_mouse(NULL, NULL);

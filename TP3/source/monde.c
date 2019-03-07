@@ -1,8 +1,10 @@
 #include "../includes/monde.h"
 
-void afficher_case(Case casee) {
+
+void afficher_case(Case casee){
 	printf("(%d, %d)\n", casee.x, casee.y);
 }
+
 
 Pomme pomme_gen_alea(int n, int m){
 	Pomme pomme;
@@ -33,21 +35,19 @@ Pomme pomme_gen_alea(int n, int m){
 int est_vide(Monde *mon, Case cases){
 	int i;
 
-  assert(mon != NULL);
+	assert(mon != NULL);
 
 	/* On vérifie si une pomme n'est pas déjà présente à cet emplacement. */
-	for (i = 0; i < mon->pommes_presentes; i++){
+	for (i = 0; i < mon->pommes_presentes; i++)
 		if ((cases.x == mon->pommes[i].coordP.x) && (cases.y == mon->pommes[i].coordP.y))
-      return 0;
-	}
+    		return 0;
 	/* On vérifie si un morceau du serpent ne se situe pas à cet emplacement. */
-	for (i = 0; i < mon->snake.taille; i++){
+	for (i = 0; i < mon->snake.taille; i++)
 		if ((cases.x == mon->snake.coordS[i].x) && (cases.y == mon->snake.coordS[i].y))
 			return 0;
-	}
-
 	return 1;
 }
+
 
 void ajouter_pomme_monde(Monde *mon, int max_pommes){
 	Pomme pomme;
@@ -59,7 +59,6 @@ void ajouter_pomme_monde(Monde *mon, int max_pommes){
 	/* Tant que la nouvelle pomme ne se situe pas sur une case vide. */
 	do{ /* On définis l'emplacement de la pomme à placer. */
 		pomme = pomme_gen_alea(mon->lignes, mon->colonnes);
-
 	}while (!est_vide(mon, pomme.coordP));
 
 	/* L'emplacement où on souhaite ajouter la pomme est vide, on peut donc l'ajouter. */
@@ -121,7 +120,7 @@ Monde init_monde(int nb_pommes, int taille_serpent, int nb_lignes, int nb_colonn
 }
 
 
-Case case_suivante(Monde mon) {
+Case case_suivante(Monde mon){
 	Case suivante;
 
 	switch( mon.snake.dir ){
@@ -194,18 +193,17 @@ void supprime_pomme(Monde *mon, int indice){
 int manger_pomme_serpent(Monde *mon){
 	Case suivante;
 	Case queue;
-	int i, indice_pomme;
+	int i, indice_pomme = -1;
 	MLV_Sound* eat;
 
 	assert(mon != NULL);
 
 	/* On regarde si la case suivante du serpent est une pomme et si oui, on récupère l'indice de la pomme. */
 	suivante = case_suivante(*mon);
-	indice_pomme = -1;
-	for (i = 0; i < mon->pommes_presentes; i++){
+	for (i = 0; i < mon->pommes_presentes; i++)
 		if (suivante.x == mon->pommes[i].coordP.x && suivante.y == mon->pommes[i].coordP.y)
 			indice_pomme = i;
-	}
+
 	/* Si indice_pomme n'est pas modifiée c'est qu'on a pas trouvé de pomme. */
 	if (indice_pomme == -1)
 		return 0;
@@ -241,12 +239,12 @@ int mort_serpent(Monde *mon){
 		if (suivante.x == mon->pommes[i].coordP.x && suivante.y == mon->pommes[i].coordP.y && mon->pommes[i].point == 0)
 			return 1;
 
-    /* On vérifie si la case suivante ne se situe pas sur les bords. */
-    if (suivante.x == mon->lignes || suivante.y == mon->colonnes || suivante.x == -1 || suivante.y == -1)
-        return 1;
+	/* On vérifie si la case suivante ne se situe pas sur les bords. */
+	if (suivante.x == mon->lignes || suivante.y == mon->colonnes || suivante.x == -1 || suivante.y == -1)
+	  	return 1;
 
-    /* On vérifie si un morceau du serpent se situe sur la case suivante. */
-    for (i = 0; i < mon->snake.taille; i++){
+	/* On vérifie si un morceau du serpent se situe sur la case suivante. */
+	for (i = 0; i < mon->snake.taille; i++){
         if ((suivante.x == mon->snake.coordS[i].x) && (suivante.y == mon->snake.coordS[i].y))
             return 1;
     }

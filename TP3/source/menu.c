@@ -5,10 +5,10 @@ void recupereDimensionBouton(char nom[], int taille, int *largeur, int *hauteur)
 
 	MLV_Font* font = MLV_load_font("../doc/font//KeepCalm-Medium.ttf", taille);
 
-  assert(nom != NULL);
-  assert(taille >= 0);
-  assert(largeur != NULL);
-  assert(hauteur != NULL);
+	assert(nom != NULL);
+	assert(taille >= 0);
+	assert(largeur != NULL);
+	assert(hauteur != NULL);
 
 	MLV_get_size_of_adapted_text_box_with_font(nom, font, 0, largeur, hauteur);
 }
@@ -59,8 +59,8 @@ int menu(){
 	recupereDimensionBouton("Jouer", taille, &largeur, &hauteur);
 	placeBouton("Jouer", FENETRE_X / 2 - largeur / 2, FENETRE_Y * 0.5, taille, COULEUR_TEXTE, &jouer);
 
-	recupereDimensionBouton("Liste Score", taille, &largeur, &hauteur);
-	placeBouton("Liste Score", FENETRE_X / 2 - largeur/2, jouer.y2 + 2 * taille/10, taille, COULEUR_TEXTE, &score);
+	recupereDimensionBouton("Meilleur Score", taille, &largeur, &hauteur);
+	placeBouton("Meilleur Score", FENETRE_X / 2 - largeur/2, jouer.y2 + 2 * taille/10, taille, COULEUR_TEXTE, &score);
 
 	recupereDimensionBouton("Quitter", taille, &largeur, &hauteur);
 	placeBouton("Quitter", FENETRE_X/2 - largeur / 2, score.y2 + 2 * taille/10, taille, COULEUR_TEXTE, &quitter);
